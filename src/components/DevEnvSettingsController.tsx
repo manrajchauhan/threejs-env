@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSceneStore, WeatherType } from "../store/useSceneStore";
 import { getInterpolatedPalette } from "../data/timeOfDayPalettes";
 import { audioEngine } from "../utils/audioEngine";
-import { Sliders, Sun, Waves, Eye, EyeOff, RotateCw, Layers, Footprints, Camera, X, CloudRain, CloudLightning, Download, Volume2, VolumeX } from "lucide-react";
+import { Sliders, Sun, Waves, Eye, EyeOff, RotateCw, Layers, Footprints, Camera, X, CloudRain, CloudLightning, Download, Volume2, VolumeX, Navigation } from "lucide-react";
 
 export function DevEnvSettingsController() {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,30 +86,41 @@ export function DevEnvSettingsController() {
           {/* Navigation Mode */}
           <div className="mb-4">
             <label className="block text-[11px] font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">
-              Camera Mode
+              Camera / Mode
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-1.5">
               <button
                 type="button"
                 onClick={() => setCameraMode("orbit")}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`py-2 px-1.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-center gap-1 ${
                   cameraMode === "orbit"
                     ? "bg-zinc-100 border-zinc-100 text-zinc-950 font-semibold"
                     : "bg-zinc-800/80 border-zinc-700/80 text-zinc-300 hover:bg-zinc-800"
                 }`}
               >
-                <Camera className="w-3.5 h-3.5" /> Orbit View
+                <Camera className="w-3.5 h-3.5" /> Orbit
               </button>
               <button
                 type="button"
                 onClick={() => setCameraMode("walk")}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`py-2 px-1.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-center gap-1 ${
                   cameraMode === "walk"
                     ? "bg-zinc-100 border-zinc-100 text-zinc-950 font-semibold"
                     : "bg-zinc-800/80 border-zinc-700/80 text-zinc-300 hover:bg-zinc-800"
                 }`}
               >
-                <Footprints className="w-3.5 h-3.5" /> Walk Mode
+                <Footprints className="w-3.5 h-3.5" /> Walk
+              </button>
+              <button
+                type="button"
+                onClick={() => setCameraMode("boat")}
+                className={`py-2 px-1.5 rounded-xl border text-xs font-medium transition-all flex items-center justify-center gap-1 ${
+                  cameraMode === "boat"
+                    ? "bg-zinc-100 border-zinc-100 text-zinc-950 font-semibold"
+                    : "bg-zinc-800/80 border-zinc-700/80 text-zinc-300 hover:bg-zinc-800"
+                }`}
+              >
+                <Navigation className="w-3.5 h-3.5 text-cyan-500" /> Drive Boat
               </button>
             </div>
           </div>

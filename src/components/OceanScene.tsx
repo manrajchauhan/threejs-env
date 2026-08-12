@@ -6,9 +6,9 @@ import { Ocean } from "./Ocean";
 import { SkyDome } from "./SkyDome";
 import { PierBoardwalk } from "./PierBoardwalk";
 import { WalkingController } from "./WalkingController";
+import { DriveableBoat } from "./DriveableBoat";
 import { StarfieldAndMoon } from "./StarfieldAndMoon";
 import { WeatherRain } from "./WeatherRain";
-import { DriftingBoat } from "./DriftingBoat";
 import { BirdFlock } from "./BirdFlock";
 import { FirePit } from "./FirePit";
 import { BioluminescentJellyfish } from "./BioluminescentJellyfish";
@@ -62,7 +62,7 @@ export function OceanScene() {
             />
           )}
 
-          <DriftingBoat />
+          <DriveableBoat />
           <BirdFlock />
           <PierBoardwalk />
           <FirePit />
@@ -81,9 +81,9 @@ export function OceanScene() {
               maxPolarAngle={Math.PI * 0.495}
               target={[0, 2, 0]}
             />
-          ) : (
+          ) : cameraMode === "walk" ? (
             <WalkingController />
-          )}
+          ) : null}
         </Suspense>
       </Canvas>
     </div>

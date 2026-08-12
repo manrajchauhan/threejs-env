@@ -2,7 +2,7 @@ import React from "react";
 import { OceanScene } from "./components/OceanScene";
 import { DevEnvSettingsController } from "./components/DevEnvSettingsController";
 import { useSceneStore } from "./store/useSceneStore";
-import { Footprints, MousePointerClick } from "lucide-react";
+import { Footprints, MousePointerClick, Navigation } from "lucide-react";
 
 export default function App() {
   const cameraMode = useSceneStore((state) => state.cameraMode);
@@ -45,6 +45,33 @@ export default function App() {
             <div className="flex items-center gap-1.5 text-zinc-300">
               <MousePointerClick className="w-3.5 h-3.5 text-zinc-400" />
               <span>{isPointerLocked ? "Locked (Esc exit)" : "Click canvas"}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Boat Driving Mode Controls Banner */}
+      {cameraMode === "boat" && (
+        <div className="fixed bottom-6 left-6 z-30 pointer-events-none">
+          <div className="bg-zinc-900/90 backdrop-blur-md px-4 py-2.5 rounded-2xl flex items-center gap-3 text-xs shadow-xl border border-cyan-500/30">
+            <div className="flex items-center gap-2 text-cyan-300 font-medium">
+              <Navigation className="w-4 h-4 text-cyan-400" />
+              <span>Boat Controls:</span>
+            </div>
+            <div className="flex items-center gap-1 text-zinc-300">
+              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[11px] font-mono">W</kbd>
+              <span className="text-zinc-500">Accelerate</span>
+            </div>
+            <span className="text-zinc-700">|</span>
+            <div className="flex items-center gap-1 text-zinc-300">
+              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[11px] font-mono">S</kbd>
+              <span className="text-zinc-500">Reverse</span>
+            </div>
+            <span className="text-zinc-700">|</span>
+            <div className="flex items-center gap-1 text-zinc-300">
+              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[11px] font-mono">A</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[11px] font-mono">D</kbd>
+              <span className="text-zinc-500">Steer Rudder</span>
             </div>
           </div>
         </div>

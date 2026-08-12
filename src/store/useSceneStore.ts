@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type CameraMode = "orbit" | "walk";
+export type CameraMode = "orbit" | "walk" | "boat";
 export type WeatherType = "clear" | "rain" | "storm";
 
 interface SceneState {
