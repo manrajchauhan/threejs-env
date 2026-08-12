@@ -1,11 +1,32 @@
 import React, { Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 import { Ocean } from "./Ocean";
 import { SkyDome } from "./SkyDome";
 import { PierBoardwalk } from "./PierBoardwalk";
 import { WalkingController } from "./WalkingController";
+import { StarfieldAndMoon } from "./StarfieldAndMoon";
+import { WeatherRain } from "./WeatherRain";
+import { DriftingBoat } from "./DriftingBoat";
 import { useSceneStore } from "../store/useSceneStore";
+
+function UnderwaterEffectController() {
+  const { camera, scene } = useThree();
+  const oceanY = useSceneStore((state) => state.oceanY);
+
+  useFrame(() => {
+    // Check if camera position Y is below ocean surface Y
+    const isUnderwater = camera.position.y < oceanY + 0.2;
+    if (isUnderwater) {
+      scene.fog = new THREE.FogExp2("#042f40", 0.025);
+    } else {
+      scene.fog = null;
+    }
+  });
+
+  return null;
+}
 
 export function OceanScene() {
   const timeOfDay = useSceneStore((state) => state.timeOfDay);
@@ -19,13 +40,16 @@ export function OceanScene() {
     <div className="w-full h-screen bg-black">
       <Canvas
         camera={{ position: [0, 8, 40], fov: 60, near: 0.1, far: 5000 }}
-        gl={{ antialias: true, powerPreference: "high-performance" }}
+        gl={{ antialias: true, preserveDrawingBuffer: true, powerPreference: "high-performance" }}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[20, 40, 20]} intensity={1.2} />
 
         <Suspense fallback={null}>
           <SkyDome timeOfDay={timeOfDay} radius={2500} />
+          <StarfieldAndMoon />
+          <WeatherRain />
+
           {oceanVisible && (
             <Ocean
               position={[0, oceanY, 0]}
@@ -36,10 +60,11 @@ export function OceanScene() {
             />
           )}
 
-          {/* Pier Boardwalk Platform for walking on */}
+          <DriftingBoat />
           <PierBoardwalk />
 
-          {/* Conditional Camera Controller */}
+          <UnderwaterEffectController />
+
           {cameraMode === "orbit" ? (
             <OrbitControls
               autoRotate={autoRotate}
