@@ -9,6 +9,9 @@ import { WalkingController } from "./WalkingController";
 import { StarfieldAndMoon } from "./StarfieldAndMoon";
 import { WeatherRain } from "./WeatherRain";
 import { DriftingBoat } from "./DriftingBoat";
+import { BirdFlock } from "./BirdFlock";
+import { FirePit } from "./FirePit";
+import { BioluminescentJellyfish } from "./BioluminescentJellyfish";
 import { useSceneStore } from "../store/useSceneStore";
 
 function UnderwaterEffectController() {
@@ -16,7 +19,6 @@ function UnderwaterEffectController() {
   const oceanY = useSceneStore((state) => state.oceanY);
 
   useFrame(() => {
-    // Check if camera position Y is below ocean surface Y
     const isUnderwater = camera.position.y < oceanY + 0.2;
     if (isUnderwater) {
       scene.fog = new THREE.FogExp2("#042f40", 0.025);
@@ -61,7 +63,10 @@ export function OceanScene() {
           )}
 
           <DriftingBoat />
+          <BirdFlock />
           <PierBoardwalk />
+          <FirePit />
+          <BioluminescentJellyfish />
 
           <UnderwaterEffectController />
 

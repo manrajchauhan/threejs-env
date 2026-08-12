@@ -11,6 +11,7 @@ interface SceneState {
   autoRotate: boolean;
   cameraMode: CameraMode;
   weather: WeatherType;
+  audioMuted: boolean;
   isPointerLocked: boolean;
   setTimeOfDay: (v: number) => void;
   setSeaState: (v: number) => void;
@@ -19,6 +20,7 @@ interface SceneState {
   setAutoRotate: (v: boolean) => void;
   setCameraMode: (mode: CameraMode) => void;
   setWeather: (w: WeatherType) => void;
+  setAudioMuted: (muted: boolean) => void;
   setIsPointerLocked: (locked: boolean) => void;
 }
 
@@ -30,6 +32,7 @@ export const useSceneStore = create<SceneState>((set) => ({
   autoRotate: true,
   cameraMode: "orbit",
   weather: "clear",
+  audioMuted: true,
   isPointerLocked: false,
   setTimeOfDay: (v) => set({ timeOfDay: v }),
   setSeaState: (v) => set({ seaState: v }),
@@ -38,5 +41,6 @@ export const useSceneStore = create<SceneState>((set) => ({
   setAutoRotate: (v) => set({ autoRotate: v }),
   setCameraMode: (mode) => set({ cameraMode: mode }),
   setWeather: (w) => set({ weather: w }),
+  setAudioMuted: (muted) => set({ audioMuted: muted }),
   setIsPointerLocked: (locked) => set({ isPointerLocked: locked }),
 }));

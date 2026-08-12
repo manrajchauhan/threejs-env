@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useSceneStore, WeatherType } from "../store/useSceneStore";
 import { getInterpolatedPalette } from "../data/timeOfDayPalettes";
-import { Sliders, Sun, Waves, Eye, EyeOff, RotateCw, Layers, Footprints, Camera, X, CloudRain, CloudLightning, Download } from "lucide-react";
+import { audioEngine } from "../utils/audioEngine";
+import { Sliders, Sun, Waves, Eye, EyeOff, RotateCw, Layers, Footprints, Camera, X, CloudRain, CloudLightning, Download, Volume2, VolumeX } from "lucide-react";
 
 export function DevEnvSettingsController() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,8 @@ export function DevEnvSettingsController() {
   const setCameraMode = useSceneStore((state) => state.setCameraMode);
   const weather = useSceneStore((state) => state.weather);
   const setWeather = useSceneStore((state) => state.setWeather);
+  const audioMuted = useSceneStore((state) => state.audioMuted);
+  const setAudioMuted = useSceneStore((state) => state.setAudioMuted);
 
   const palette = getInterpolatedPalette(timeOfDay);
 
@@ -46,6 +49,12 @@ export function DevEnvSettingsController() {
     } else if (mode === "clear") {
       setSeaState(0.6);
     }
+  };
+
+  const toggleAudio = () => {
+    const nextMuted = !audioMuted;
+    audioEngine.setMuted(nextMuted);
+    setAudioMuted(nextMuted);
   };
 
   return (
@@ -206,12 +215,25 @@ export function DevEnvSettingsController() {
               />
             </div>
 
-            {/* Toggles & Snapshot */}
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800">
+            {/* Audio & Snapshot & Toggles */}
+            <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-zinc-800">
+              <button
+                type="button"
+                onClick={toggleAudio}
+                className={`flex items-center justify-center gap-1 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
+                  !audioMuted
+                    ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
+                    : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {!audioMuted ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+                Audio
+              </button>
+
               <button
                 type="button"
                 onClick={() => setOceanVisible(!oceanVisible)}
-                className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                className={`flex items-center justify-center gap-1 py-2 px-2 rounded-xl border text-xs font-medium transition-all ${
                   oceanVisible
                     ? "bg-zinc-800 border-zinc-700 text-zinc-100"
                     : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-zinc-300"
@@ -224,7 +246,7 @@ export function DevEnvSettingsController() {
               <button
                 type="button"
                 onClick={handleSnapshot}
-                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium transition-all"
+                className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-medium transition-all"
               >
                 <Download className="w-3.5 h-3.5 text-emerald-400" />
                 Snapshot
