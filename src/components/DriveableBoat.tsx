@@ -9,15 +9,16 @@ const _camLookTarget = new THREE.Vector3();
 export function DriveableBoat() {
   const { camera } = useThree();
   const cameraMode = useSceneStore((state) => state.cameraMode);
+  const setCameraMode = useSceneStore((state) => state.setCameraMode);
   const seaState = useSceneStore((state) => state.seaState);
   const oceanY = useSceneStore((state) => state.oceanY);
 
   const boatGroup = useRef<THREE.Group>(null);
   const wakeParticlesRef = useRef<THREE.Points>(null);
 
-  // Boat physics state
-  const boatPos = useRef(new THREE.Vector3(25, oceanY + 0.3, 10));
-  const boatHeading = useRef(0); // Yaw angle
+  // Initial docked position next to the pier deck
+  const boatPos = useRef(new THREE.Vector3(8, oceanY + 0.35, 10));
+  const boatHeading = useRef(0);
   const boatSpeed = useRef(0);
   const rudderAngle = useRef(0);
 
@@ -28,47 +29,60 @@ export function DriveableBoat() {
     right: false,
   });
 
-  // Setup Keyboard Listeners
+  // Setup Keyboard Listeners for Driving & Exit (E / F key)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      switch (e.code) {
-        case "KeyW":
-        case "ArrowUp":
-          keys.current.forward = true;
-          break;
-        case "KeyS":
-        case "ArrowDown":
-          keys.current.backward = true;
-          break;
-        case "KeyA":
-        case "ArrowLeft":
-          keys.current.left = true;
-          break;
-        case "KeyD":
-        case "ArrowRight":
-          keys.current.right = true;
-          break;
+      if (cameraMode === "boat") {
+        if (e.code === "KeyE" || e.code === "KeyF") {
+          // Exit boat back to walk mode on pier
+          setCameraMode("walk");
+          if (document.pointerLockElement) {
+            document.exitPointerLock();
+          }
+          return;
+        }
+
+        switch (e.code) {
+          case "KeyW":
+          case "ArrowUp":
+            keys.current.forward = true;
+            break;
+          case "KeyS":
+          case "ArrowDown":
+            keys.current.backward = true;
+            break;
+          case "KeyA":
+          case "ArrowLeft":
+            keys.current.left = true;
+            break;
+          case "KeyD":
+          case "ArrowRight":
+            keys.current.right = true;
+            break;
+        }
       }
     };
 
     const onKeyUp = (e: KeyboardEvent) => {
-      switch (e.code) {
-        case "KeyW":
-        case "ArrowUp":
-          keys.current.forward = false;
-          break;
-        case "KeyS":
-        case "ArrowDown":
-          keys.current.backward = false;
-          break;
-        case "KeyA":
-        case "ArrowLeft":
-          keys.current.left = false;
-          break;
-        case "KeyD":
-        case "ArrowRight":
-          keys.current.right = false;
-          break;
+      if (cameraMode === "boat") {
+        switch (e.code) {
+          case "KeyW":
+          case "ArrowUp":
+            keys.current.forward = false;
+            break;
+          case "KeyS":
+          case "ArrowDown":
+            keys.current.backward = false;
+            break;
+          case "KeyA":
+          case "ArrowLeft":
+            keys.current.left = false;
+            break;
+          case "KeyD":
+          case "ArrowRight":
+            keys.current.right = false;
+            break;
+        }
       }
     };
 
@@ -78,7 +92,7 @@ export function DriveableBoat() {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, []);
+  }, [cameraMode, setCameraMode]);
 
   // Water Wake Particle System
   const wakeParticleCount = 150;
@@ -102,7 +116,6 @@ export function DriveableBoat() {
       } else if (keys.current.backward) {
         boatSpeed.current = Math.max(maxReverseSpeed, boatSpeed.current - accel * dt);
       } else {
-        // Friction deceleration
         boatSpeed.current = THREE.MathUtils.lerp(boatSpeed.current, 0, friction * dt);
       }
 
@@ -116,19 +129,18 @@ export function DriveableBoat() {
         rudderAngle.current = THREE.MathUtils.lerp(rudderAngle.current, 0, dt * 6);
       }
 
-      // Turn rate depends on movement speed
       const effectiveTurn = rudderAngle.current * steerSpeed * (boatSpeed.current / maxForwardSpeed);
       boatHeading.current += effectiveTurn * dt;
 
-      // Update position
       const forwardX = Math.sin(boatHeading.current);
       const forwardZ = Math.cos(boatHeading.current);
       boatPos.current.x += forwardX * boatSpeed.current * dt;
       boatPos.current.z += forwardZ * boatSpeed.current * dt;
 
-      // Clamp to ocean boundary
       boatPos.current.x = THREE.MathUtils.clamp(boatPos.current.x, -500, 500);
       boatPos.current.z = THREE.MathUtils.clamp(boatPos.current.z, -500, 500);
+    } else {
+      boatSpeed.current = THREE.MathUtils.lerp(boatSpeed.current, 0, dt * 5);
     }
 
     // Wave buoyancy & Banking turn roll

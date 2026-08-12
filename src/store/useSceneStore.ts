@@ -13,6 +13,7 @@ interface SceneState {
   weather: WeatherType;
   audioMuted: boolean;
   isPointerLocked: boolean;
+  isNearBoat: boolean;
   setTimeOfDay: (v: number) => void;
   setSeaState: (v: number) => void;
   setOceanY: (v: number) => void;
@@ -22,6 +23,7 @@ interface SceneState {
   setWeather: (w: WeatherType) => void;
   setAudioMuted: (muted: boolean) => void;
   setIsPointerLocked: (locked: boolean) => void;
+  setIsNearBoat: (near: boolean) => void;
 }
 
 export const useSceneStore = create<SceneState>((set) => ({
@@ -34,6 +36,7 @@ export const useSceneStore = create<SceneState>((set) => ({
   weather: "clear",
   audioMuted: true,
   isPointerLocked: false,
+  isNearBoat: false,
   setTimeOfDay: (v) => set({ timeOfDay: v }),
   setSeaState: (v) => set({ seaState: v }),
   setOceanY: (v) => set({ oceanY: v }),
@@ -43,4 +46,5 @@ export const useSceneStore = create<SceneState>((set) => ({
   setWeather: (w) => set({ weather: w }),
   setAudioMuted: (muted) => set({ audioMuted: muted }),
   setIsPointerLocked: (locked) => set({ isPointerLocked: locked }),
+  setIsNearBoat: (near) => set({ isNearBoat: near }),
 }));

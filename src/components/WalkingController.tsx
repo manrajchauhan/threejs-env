@@ -11,6 +11,9 @@ const _right = new THREE.Vector3();
 export function WalkingController() {
   const { camera, gl } = useThree();
   const setIsPointerLocked = useSceneStore((state) => state.setIsPointerLocked);
+  const setIsNearBoat = useSceneStore((state) => state.setIsNearBoat);
+  const setCameraMode = useSceneStore((state) => state.setCameraMode);
+  const cameraMode = useSceneStore((state) => state.cameraMode);
 
   const keys = useRef({
     forward: false,
@@ -20,12 +23,15 @@ export function WalkingController() {
     turnLeft: false,
     turnRight: false,
     sprint: false,
+    jump: false,
   });
 
   const yaw = useRef(0);
   const pitch = useRef(0);
   const isLocked = useRef(false);
   const playerPos = useRef(new THREE.Vector3(0, 2.2, 12));
+  const velocityY = useRef(0);
+  const isGrounded = useRef(true);
   const headBobTimer = useRef(0);
 
   // Setup Keyboard Listeners
@@ -53,6 +59,12 @@ export function WalkingController() {
         case "KeyE":
         case "ArrowRight":
           keys.current.turnRight = true;
+          break;
+        case "Space":
+          if (isGrounded.current) {
+            velocityY.current = 10;
+            isGrounded.current = false;
+          }
           break;
         case "ShiftLeft":
         case "ShiftRight":
@@ -119,7 +131,7 @@ export function WalkingController() {
     };
 
     const onClickCanvas = () => {
-      if (!isLocked.current) {
+      if (!isLocked.current && cameraMode === "walk") {
         canvas.requestPointerLock();
       }
     };
@@ -133,10 +145,11 @@ export function WalkingController() {
       document.removeEventListener("pointerlockchange", onPointerLockChange);
       document.removeEventListener("mousemove", onMouseMove);
     };
-  }, [gl, setIsPointerLocked]);
+  }, [gl, setIsPointerLocked, cameraMode]);
 
-  // Frame animation loop for movement & rotation
+  // Frame animation loop for movement, jump gravity & boat proximity
   useFrame((_, delta) => {
+    if (cameraMode !== "walk") return;
     const dt = Math.min(delta, 0.1);
 
     // Keyboard rotation if mouse not locked
@@ -167,17 +180,35 @@ export function WalkingController() {
     playerPos.current.x = THREE.MathUtils.clamp(playerPos.current.x, -7.2, 7.2);
     playerPos.current.z = THREE.MathUtils.clamp(playerPos.current.z, -38, 18);
 
-    // Head bobbing effect
+    // Jump Physics (Gravity)
+    const gravity = -26;
+    velocityY.current += gravity * dt;
+    playerPos.current.y += velocityY.current * dt;
+
+    const floorY = 2.2;
+    if (playerPos.current.y <= floorY) {
+      playerPos.current.y = floorY;
+      velocityY.current = 0;
+      isGrounded.current = true;
+    }
+
+    // Head bobbing effect when walking on floor
     let bobY = 0;
-    if (isMoving) {
+    if (isMoving && isGrounded.current) {
       headBobTimer.current += dt * (keys.current.sprint ? 14 : 9);
       bobY = Math.sin(headBobTimer.current) * 0.06;
     }
 
-    camera.position.set(playerPos.current.x, 2.2 + bobY, playerPos.current.z);
+    camera.position.set(playerPos.current.x, playerPos.current.y + bobY, playerPos.current.z);
 
     _euler.set(pitch.current, yaw.current, 0, "YXZ");
     camera.quaternion.setFromEuler(_euler);
+
+    // Check Proximity to Boat Docked at Pier Edge [8, y, 10]
+    const boatDockPos = new THREE.Vector3(8, 0.5, 10);
+    const distToBoat = playerPos.current.distanceTo(boatDockPos);
+    const near = distToBoat < 7.5;
+    setIsNearBoat(near);
   });
 
   return null;
