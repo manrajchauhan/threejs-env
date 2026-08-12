@@ -1,7 +1,7 @@
 import React from "react";
 import { useSceneStore } from "../store/useSceneStore";
 import { getInterpolatedPalette } from "../data/timeOfDayPalettes";
-import { Sliders, Sun, Waves, Eye, EyeOff, RotateCw, Layers } from "lucide-react";
+import { Sliders, Sun, Waves, Eye, EyeOff, RotateCw, Layers, Footprints, Camera } from "lucide-react";
 
 export function DevEnvSettingsController() {
   const timeOfDay = useSceneStore((state) => state.timeOfDay);
@@ -14,6 +14,8 @@ export function DevEnvSettingsController() {
   const setOceanVisible = useSceneStore((state) => state.setOceanVisible);
   const autoRotate = useSceneStore((state) => state.autoRotate);
   const setAutoRotate = useSceneStore((state) => state.setAutoRotate);
+  const cameraMode = useSceneStore((state) => state.cameraMode);
+  const setCameraMode = useSceneStore((state) => state.setCameraMode);
 
   const palette = getInterpolatedPalette(timeOfDay);
 
@@ -43,6 +45,38 @@ export function DevEnvSettingsController() {
           </span>
         </div>
 
+        {/* Camera Navigation Mode Selector */}
+        <div className="mb-4">
+          <label className="block text-[11px] font-medium text-zinc-400 mb-1.5 uppercase tracking-wider">
+            Navigation Mode
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setCameraMode("orbit")}
+              className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                cameraMode === "orbit"
+                  ? "bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-950/50"
+                  : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              <Camera className="w-3.5 h-3.5" /> Orbit View
+            </button>
+            <button
+              type="button"
+              onClick={() => setCameraMode("walk")}
+              className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                cameraMode === "walk"
+                  ? "bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-950/50"
+                  : "bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              <Footprints className="w-3.5 h-3.5" /> Walk Mode
+            </button>
+          </div>
+        </div>
+
+        {/* Sliders */}
         <div className="space-y-4 text-xs">
           {/* Time of Day */}
           <div>
@@ -113,18 +147,20 @@ export function DevEnvSettingsController() {
               Ocean Mesh
             </button>
 
-            <button
-              type="button"
-              onClick={() => setAutoRotate(!autoRotate)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
-                autoRotate
-                  ? "bg-cyan-500/15 border-cyan-500/40 text-cyan-300"
-                  : "bg-zinc-900/60 border-zinc-800 text-zinc-500 hover:text-zinc-300"
-              }`}
-            >
-              <RotateCw className={`w-3.5 h-3.5 ${autoRotate ? "animate-spin" : ""}`} />
-              Auto Orbit
-            </button>
+            {cameraMode === "orbit" && (
+              <button
+                type="button"
+                onClick={() => setAutoRotate(!autoRotate)}
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border text-xs font-medium transition-all ${
+                  autoRotate
+                    ? "bg-cyan-500/15 border-cyan-500/40 text-cyan-300"
+                    : "bg-zinc-900/60 border-zinc-800 text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <RotateCw className={`w-3.5 h-3.5 ${autoRotate ? "animate-spin" : ""}`} />
+                Auto Orbit
+              </button>
+            )}
           </div>
         </div>
       </div>
